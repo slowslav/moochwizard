@@ -1,0 +1,25 @@
+# build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+
+# idea
+.idea
+*.iws
+*.iml
+*.ipr
+
+# maven
+.mvn
+
+#private config
+/src/main/resources/application.properties
+/src/main/resources/twitter4j.properties
+
+# exec
+yt-dlp
+
+# server info
+gcloud.md
