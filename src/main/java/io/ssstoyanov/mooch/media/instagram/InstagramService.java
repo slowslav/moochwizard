@@ -109,9 +109,7 @@ public class InstagramService implements MediaService {
         }
         if (type == ContentType.VIDEO) {
             Content content = new Content().setType(ContentType.VIDEO).setMedia(Collections.singletonList(new Media().setType(MediaType.IMAGE).setUrl(json.get(ITEMS)
-                    .get(0).get(IMAGE_VERSIONS_2)
-                    .get(CANDIDATES).get(0)
-                    .get(URL).asText())));
+                    .get(0).get(VIDEO_VERSIONS).get(0).get(URL).asText())));
             content.setText(json.findValue(CAPTION).findValue(TEXT).asText());
             return content;
         }

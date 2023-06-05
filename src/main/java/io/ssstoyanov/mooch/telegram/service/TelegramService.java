@@ -6,6 +6,7 @@ import io.ssstoyanov.mooch.media.entity.Content;
 import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultAudio;
@@ -133,9 +134,9 @@ public abstract class TelegramService {
 
     protected void setCaption(ParsedContentEvent event, Update message, SendPhoto photo) {
         if (event.getObject().getText() != null) {
-            photo.setCaption(setSearchRequestInline(message) + "\n\n" + setCaption(event.getObject().getText()));
+            photo.setCaption(setSearchRequest(message) + "\n\n" + setCaption(event.getObject().getText()));
         } else {
-            photo.setCaption(setSearchRequestInline(message));
+            photo.setCaption(setSearchRequest(message));
         }
     }
 
@@ -190,5 +191,13 @@ public abstract class TelegramService {
         res.setId(UUID.randomUUID().toString());
         res.setTitle(UUID.randomUUID().toString());
         res.setMimeType(IMAGE_JPEG);
+    }
+
+    protected void setCaption(ParsedContentEvent event, Update update, SendVideo res) {
+        if (event.getObject().getText() != null) {
+            res.setCaption(setSearchRequest(update) + "\n\n" + setCaption(event.getObject().getText()));
+        } else {
+            res.setCaption(setSearchRequest(update));
+        }
     }
 }

@@ -39,7 +39,7 @@ public class TelegramMessageService extends TelegramService {
         setCaption(event, message, photo);
         photo.setParseMode(MARKDOWN);
 
-        publisher.publishEvent(new SendPhotoEvent(photo));
+        publisher.publishEvent(new SendPhotoEvent(photo, message));
     }
 
     @EventListener(value = ParsedContentEvent.class,
@@ -54,14 +54,11 @@ public class TelegramMessageService extends TelegramService {
             video.setThumb(new InputFile().setMedia(Utils.getInputStream(thumbnailUrl), String.valueOf(UUID.randomUUID())));
         video.setVideo(new InputFile().setMedia(Utils.getInputStream(videoUrl), String.valueOf(UUID.randomUUID())));
         video.setChatId(message.getMessage().getChatId());
-        if (event.getObject().getText() != null) {
-            video.setCaption(setSearchRequest(message) + "\n" + event.getObject().getText());
-        } else {
-            video.setCaption(setSearchRequest(message));
-        }
+        setCaption(event, message, video);
         video.setParseMode(MARKDOWN);
-        publisher.publishEvent(new SendVideoEvent(video));
+        publisher.publishEvent(new SendVideoEvent(video, message));
     }
+
 
     @EventListener(value = ParsedContentEvent.class,
             condition = "#event.object.type == T(io.ssstoyanov.mooch.media.entity.ContentType).AUDIO")
@@ -73,12 +70,18 @@ public class TelegramMessageService extends TelegramService {
 
         var audio = new SendAudio();
         audio.setCaption(setSearchRequestAudio(message) + content.getText());
-        audio.setAudio(new InputFile().setMedia(Utils.getInputStream(audioUrl), content.getName()));
+        if (audioUrl == null || audioUrl.isBlank() || org.apache.commons.lang3.StringUtils.equalsIgnoreCase("null", audioUrl)) {
+            prepareText(event);
+            return;
+        } else {
+            audio.setAudio(new InputFile().setMedia(Utils.getInputStream(audioUrl), content.getName()));
+        }
+
         audio.setThumb(new InputFile().setMedia(Utils.getInputStream(thumbnailUrl), UUID.randomUUID().toString()));
         audio.setChatId(message.getMessage().getChatId());
         audio.setParseMode(MARKDOWN);
 
-        publisher.publishEvent(new SendAudioEvent(audio));
+        publisher.publishEvent(new SendAudioEvent(audio, message));
     }
 
     @EventListener(value = ParsedContentEvent.class,
@@ -99,7 +102,7 @@ public class TelegramMessageService extends TelegramService {
         mediaGroup.setMedias(photos);
         mediaGroup.setChatId(message.getMessage().getChatId());
 
-        publisher.publishEvent(new SendMediaGroupEvent(mediaGroup));
+        publisher.publishEvent(new SendMediaGroupEvent(mediaGroup, message));
     }
 
 
@@ -124,7 +127,7 @@ public class TelegramMessageService extends TelegramService {
 
         mediaGroup.setMedias(videos);
         mediaGroup.setChatId(message.getMessage().getChatId());
-        publisher.publishEvent(new SendMediaGroupEvent(mediaGroup));
+        publisher.publishEvent(new SendMediaGroupEvent(mediaGroup, message));
     }
 
     @EventListener(value = ParsedContentEvent.class,
@@ -136,8 +139,9 @@ public class TelegramMessageService extends TelegramService {
 
         setCaption(update, message, content);
         message.setChatId(update.getMessage().getChatId());
+        message.setParseMode(MARKDOWN);
 
-        publisher.publishEvent(new SendMessageEvent(message));
+        publisher.publishEvent(new SendMessageEvent(message, update));
     }
 
 
@@ -164,27 +168,26 @@ public class TelegramMessageService extends TelegramService {
         mediaGroup.setMedias(medias);
         mediaGroup.setChatId(message.getMessage().getChatId());
 
-        publisher.publishEvent(new SendMediaGroupEvent(mediaGroup));
+        publisher.publishEvent(new SendMediaGroupEvent(mediaGroup, message));
     }
 
-    @EventListener(value = ParsedContentEvent.class,
-            condition = "!(#event.object.type == T(io.ssstoyanov.mooch.media.entity.ContentType).ERROR)")
-    public void deleteMessage(ParsedContentEvent event) {
-        var message = event.getMessage();
+    @EventListener(value = RemoveMessageContentEvent.class)
+    public void deleteMessage(RemoveMessageContentEvent event) {
+        var message = event.getObject();
         var delete = new DeleteMessage();
         delete.setMessageId(message.getMessage().getMessageId());
         delete.setChatId(message.getMessage().getChatId());
         publisher.publishEvent(new DeleteMessageEvent(delete));
     }
 
-    @EventListener(value = ParsedContentEvent.class,
-            condition = "#event.object.type == T(io.ssstoyanov.mooch.media.entity.ContentType).ERROR")
-    public void prepareError(ParsedContentEvent event) {
-        Update update = event.getMessage();
+    @EventListener(value = ErrorMessageContentEvent.class)
+    public void prepareError(ErrorMessageContentEvent event) {
+        Update update = event.getObject();
         var message = new SendMessage();
-        message.setText(event.getObject().getText());
+        message.setText("Unexpected error occurred while retrieving content. Please contact with developer @ssstoyanov");
         message.setChatId(update.getMessage().getChatId());
-        publisher.publishEvent(new SendTextEvent(message));
+        message.setReplyToMessageId(update.getMessage().getMessageId());
+        publisher.publishEvent(new SendMessageEvent(message, update));
     }
 
 }

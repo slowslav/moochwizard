@@ -2,6 +2,8 @@ package io.ssstoyanov.mooch.telegram;
 
 import io.ssstoyanov.mooch.event.*;
 import io.ssstoyanov.mooch.telegram.command.HelpCommand;
+import io.ssstoyanov.mooch.telegram.service.ErrorMessageContentEvent;
+import io.ssstoyanov.mooch.telegram.service.RemoveMessageContentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,45 +71,60 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     @EventListener(SendPhotoEvent.class)
     public void send(SendPhotoEvent event) {
         try {
-            super.execute(event.getObject());
+            var response = super.execute(event.getObject());
+            if (response.hashCode() == 200)
+                publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
+            publisher.publishEvent(new ErrorMessageContentEvent(event.getMessage()));
         }
     }
 
     @EventListener(SendVideoEvent.class)
     public void send(SendVideoEvent event) {
         try {
-            super.execute(event.getObject());
+            var response = super.execute(event.getObject());
+            if (response.hashCode() == 200)
+                publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
+            publisher.publishEvent(new ErrorMessageContentEvent(event.getMessage()));
         }
     }
 
     @EventListener(SendAudioEvent.class)
     public void send(SendAudioEvent event) {
         try {
-            super.execute(event.getObject());
+            var response = super.execute(event.getObject());
+            if (response.hashCode() == 200)
+                publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
+            publisher.publishEvent(new ErrorMessageContentEvent(event.getMessage()));
         }
     }
 
     @EventListener(SendMediaGroupEvent.class)
     public void send(SendMediaGroupEvent event) {
         try {
-            super.execute(event.getObject());
+            var response = super.execute(event.getObject());
+            if (response.hashCode() == 200)
+                publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
+            publisher.publishEvent(new ErrorMessageContentEvent(event.getMessage()));
         }
     }
 
     @EventListener(SendMessageEvent.class)
     public void send(SendMessageEvent event) {
         try {
-            super.execute(event.getObject());
+            var response = super.execute(event.getObject());
+            if (response.hashCode() == 200)
+                publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
+            publisher.publishEvent(new ErrorMessageContentEvent(event.getMessage()));
         }
     }
 

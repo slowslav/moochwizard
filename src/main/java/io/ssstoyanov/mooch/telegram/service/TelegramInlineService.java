@@ -3,6 +3,7 @@ package io.ssstoyanov.mooch.telegram.service;
 import io.ssstoyanov.mooch.event.AnswerInlineQueryEvent;
 import io.ssstoyanov.mooch.event.ParsedInlineContentEvent;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -74,9 +75,9 @@ public class TelegramInlineService extends TelegramService {
         var update = event.getMessage();
         var content = event.getObject();
         var url = content.getFirstMedia().getUrl();
-        var res = new InlineQueryResultAudio();
 
-        if (url != null) {
+        if (url != null && !url.isBlank() && !StringUtils.equalsIgnoreCase("null", url)) {
+            var res = new InlineQueryResultAudio();
             res.setAudioUrl(url);
             setCaption(update, content, res);
             res.setParseMode(MARKDOWN);
@@ -84,11 +85,15 @@ public class TelegramInlineService extends TelegramService {
             res.setTitle(content.getName());
             answer.setResults(Collections.singletonList(res));
         } else {
+            InlineQueryResultArticle res = new InlineQueryResultArticle();
             var inputMessageContent = new InputTextMessageContent();
             inputMessageContent.setParseMode(MARKDOWN);
             inputMessageContent.setMessageText(setSearchRequestInlineAudio(update) + content.getText());
             inputMessageContent.setDisableWebPagePreview(false);
+            res.setId(UUID.randomUUID().toString());
+            res.setTitle(content.getName());
             res.setInputMessageContent(inputMessageContent);
+            answer.setResults(Collections.singletonList(res));
         }
         answer.setInlineQueryId(update.getInlineQuery().getId());
         answer.setCacheTime(15);
