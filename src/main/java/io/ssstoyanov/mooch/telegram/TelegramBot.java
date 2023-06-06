@@ -72,7 +72,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendPhotoEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hashCode() == 200)
+            if (response.hasPhoto())
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
@@ -84,7 +84,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendVideoEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hashCode() == 200)
+            if (response.hasVideo())
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
@@ -96,7 +96,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendAudioEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hashCode() == 200)
+            if (response.hasAudio())
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
@@ -108,7 +108,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendMediaGroupEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hashCode() == 200)
+            if (!response.isEmpty())
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
@@ -120,7 +120,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendMessageEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hashCode() == 200)
+            if (response.hasText())
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
