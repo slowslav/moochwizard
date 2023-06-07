@@ -54,6 +54,7 @@ public class ParsingService {
     public void parseMessage(IncomingInlineEvent event) {
         var message = event.getObject();
         var url = message.getInlineQuery().getQuery();
+        url = addHttpsToLink(url);
         parseAndPublishInline(message, Collections.singletonList(url));
     }
 
@@ -62,6 +63,7 @@ public class ParsingService {
             for (AbstractMap.SimpleEntry<List<String>, ServiceType> service : MAPPING) {
                 if (service.getKey().stream().anyMatch(url::contains)) {
                     Content content;
+                    url = addHttpsToLink(url);
                     try {
                         content = services.get(service.getValue()).getContent(url);
                         publisher.publishEvent(new ParsedContentEvent(content, message));
@@ -117,5 +119,12 @@ public class ParsingService {
             return url.replace(matcher.group(0), "");
         }
         return url;
+    }
+
+    public String addHttpsToLink(String link) {
+        if (!link.startsWith("https://") && !link.startsWith("http://")) {
+            link = "https://" + link;
+        }
+        return link;
     }
 }
