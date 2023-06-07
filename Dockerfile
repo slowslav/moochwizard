@@ -17,6 +17,7 @@ LABEL version="1.0.1"
 
 RUN apt-get update && apt-get install -y curl python3 python3-pip && \
         python3 -m pip install --upgrade pip
+RUN pip install numpy
 RUN pip install sumy
 RUN python3 -c "import nltk; nltk.download('punkt')" && \
     apt-get clean && \

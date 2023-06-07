@@ -107,7 +107,7 @@ public final class Utils {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             int exitCode = process.waitFor();
-            String line = reader.lines().findAny().orElse("");
+            String line = reader.lines().collect(Collectors.joining(" "));
             if (exitCode != 0) {
                 log.error("Error: sumy exited with code " + exitCode);
             }

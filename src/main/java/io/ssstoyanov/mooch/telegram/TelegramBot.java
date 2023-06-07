@@ -72,7 +72,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendPhotoEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hasPhoto())
+            if (response.hasPhoto() && response.getReplyToMessage()  == null)
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
@@ -84,7 +84,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendVideoEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hasVideo())
+            if (response.hasVideo() && response.getReplyToMessage()  == null)
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
@@ -96,7 +96,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendAudioEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hasAudio())
+            if (response.hasAudio() && response.getReplyToMessage()  == null)
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
@@ -120,7 +120,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
     public void send(SendMessageEvent event) {
         try {
             var response = super.execute(event.getObject());
-            if (response.hasText())
+            if (response.hasText() && response.getReplyToMessage()  == null)
                 publisher.publishEvent(new RemoveMessageContentEvent(event.getMessage()));
         } catch (TelegramApiException e) {
             log.error(e);
