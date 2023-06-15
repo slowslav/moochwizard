@@ -184,7 +184,7 @@ public class TelegramMessageService extends TelegramService {
     public void prepareError(ErrorMessageContentEvent event) {
         Update update = event.getObject();
         var message = new SendMessage();
-        message.setText("Unexpected error occurred while retrieving content. Please contact with developer @ssstoyanov");
+        message.setText("Unexpected error occurred while retrieving content. Please contact developer @ssstoyanov");
         message.setChatId(update.getMessage().getChatId());
         message.setReplyToMessageId(update.getMessage().getMessageId());
         publisher.publishEvent(new SendMessageEvent(message, update));
